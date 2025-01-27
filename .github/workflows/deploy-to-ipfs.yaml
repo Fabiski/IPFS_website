@@ -25,8 +25,8 @@ jobs:
       run: |
         # Crée un fichier temporaire pour le contenu du site
         mkdir -p ./site
-        cp -r * ./site
-
+        find . -maxdepth 1 ! -path ./site ! -path . -exec cp -r {} ./site/ \;
+        
         # Envoie les fichiers à Pinata sous forme de dossier
         response=$(curl -X POST https://api.pinata.cloud/pinning/pinFileToIPFS \
           -H "pinata_api_key: $PINATA_API_KEY" \
