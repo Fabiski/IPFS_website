@@ -23,15 +23,19 @@ jobs:
         PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
         PINATA_API_SECRET: ${{ secrets.PINATA_API_SECRET }}
       run: |
-        # Compresse le site en un fichier .zip
-        zip -r site.zip .
-        
-        # Upload du fichier sur Pinata
+        # Crée un fichier temporaire pour le contenu du site
+        mkdir -p ./site
+        cp -r * ./site
+
+        # Envoie les fichiers à Pinata sous forme de dossier
         response=$(curl -X POST https://api.pinata.cloud/pinning/pinFileToIPFS \
           -H "pinata_api_key: $PINATA_API_KEY" \
           -H "pinata_secret_api_key: $PINATA_API_SECRET" \
-          -F "file=@site.zip")
-        
+          -F "file=@site" \
+          -F "pinataOptions={\"wrapWithDirectory\": true}")
+
         # Récupère le CID du site
         cid=$(echo $response | jq -r '.IpfsHash')
+
+        # Affiche le lien public pour accéder au site
         echo "Le site est maintenant en ligne sur : https://gateway.pinata.cloud/ipfs/$cid"
